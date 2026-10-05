@@ -5,11 +5,12 @@
 #include "ws2812.pio.h"
 
 
-SK6812::SK6812(uint strip_len, uint8_t din_pin, pio_hw_t *pio, uint sm, uint32_t frequency) :
+SK6812::SK6812(uint strip_len, uint8_t din_pin, pio_hw_t *pio, uint sm, uint32_t frequency, bool rgbw) :
    strip_len(strip_len),
    din_pin(din_pin),
    clk_freq(frequency),
    pio_state_machine(sm),
+   rgbw(rgbw),
    pio(pio)
 {
    printf("CONSTRUCTING SK6812\n");

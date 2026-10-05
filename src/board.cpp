@@ -12,8 +12,6 @@ extern "C" {
 
 
 
-
-
 void Board::status_task_timer_callback(TimerHandle_t timer) {
    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
    Board &board = Board::getInstance();
@@ -50,12 +48,14 @@ void Board::statusTask(void *parms) {
       xTimerStart(board.statusTimerHandle, 0);
    }
 
-   board.stripSelfTest();
 
    // uint32_t frame = 0;
    uint8_t network_blink_index = 0;
    for(;;) {
       ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+      printf("STRIP SELF TEST %d\n", network_blink_index);
+      board.stripSelfTest();
 
       // frame++;
       network_blink_index++;
@@ -88,6 +88,7 @@ int Board::interpolateRamp(int width, int height, int offset) {
 }
 
 void Board::stripSelfTest() {
+#if 0
    // Ramp brightness from zero to full
    for(int j = 0; j <= SK6812::MAX_BRIGHTNESS; j++) {
       led_strip->set_all(255, 255, 255, j);
@@ -101,14 +102,14 @@ void Board::stripSelfTest() {
       led_strip->update_strip();
       vTaskDelay(10);
    }
-
+#endif
    // Perform a few pretty color ramps real quick
    for(int i = 0; i < config.strip_length; i++) {
       for(int j = 0; j < config.strip_length; j++) {
          int r = interpolateRamp(config.strip_length, 255, j);
          int g = interpolateRamp(config.strip_length, 255, j + i - (config.strip_length / 2));
          int b = interpolateRamp(config.strip_length, 255, j + (config.strip_length / 2) - i);
-         //printf("%3d\t%3d\t%3d\t%3d\t%3d\n", i, i % config.strip_length, r, g, b);
+         // printf("%3d\t%3d\t%3d\t%3d\t%3d\n", i, i % config.strip_length, r, g, b);
          led_strip->set_led(j, r, g, b);
       }
       led_strip->update_strip();
@@ -148,6 +149,7 @@ void Board::stripSelfTest() {
       vTaskDelay(10);
    }
 
+#if 0
    // Ramp brightness from zero to full
    for(int j = 0; j <= SK6812::MAX_BRIGHTNESS; j++) {
       led_strip->set_all(255, 255, 255, j);
@@ -161,9 +163,15 @@ void Board::stripSelfTest() {
       led_strip->update_strip();
       vTaskDelay(10);
    }
+#endif
 
    led_strip->clear_strip();
    led_strip->update_strip();
+}
+
+
+static inline void put_pixel(PIO pio, uint sm, uint32_t pixel_grb) {
+    pio_sm_put_blocking(pio, sm, pixel_grb);
 }
 
 
@@ -173,6 +181,12 @@ void Board::init() {
    initBoardConfig();
 
    sleep_ms(100);
+
+   // for(;;) {
+   //    put_pixel(STRIP_PIO, STRIP_SM, 0x2b00b1e5);
+   //    sleep_ms(10);
+   // }
+
 
    xTaskCreate(statusTask, "Board Status Task", 512, NULL, 0, NULL);
 

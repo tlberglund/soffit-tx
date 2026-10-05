@@ -32,12 +32,6 @@ typedef struct {
    uint32_t crc;
 } BoardConfig;
 
-#define SERVICE_UUID "a7f2d9e1-3c4b-4a8e-b5c6-1f2e3d4c5b6a"
-#define CHAR_UUID "b8e3c9f2-4d5c-4b9f-c6d7-2e3f4d5c6b7a"
-
-
-
-
 
 
 class Board {
@@ -54,9 +48,8 @@ class Board {
       Board& operator=(const Board&) = delete;
 
    private:
-      Board() : frameCount(0),
-                stripBrightness(15) {
-         led_strip = new SK6812(60, STRIP_DATA_PIN, STRIP_PIO, STRIP_SM);
+      Board() : frameCount(0) {
+         led_strip = new SK6812(60, STRIP_DATA_PIN, STRIP_PIO, STRIP_SM, 800000, true);
       };
 
       static void statusTask(void *parms);
@@ -68,7 +61,6 @@ class Board {
 
       SK6812 *led_strip;
       volatile uint64_t frameCount;
-      volatile uint8_t stripBrightness;
       BoardConfig config;
       TimerHandle_t statusTimerHandle;
 

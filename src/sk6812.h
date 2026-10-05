@@ -21,6 +21,7 @@ class SK6812 {
       SK6812(uint strip_len, uint8_t din_pin) : SK6812(strip_len, din_pin, pio0, 0) {};
       SK6812(uint strip_len, uint8_t din_pin, pio_hw_t *pio, uint sm) : SK6812(strip_len, din_pin, pio, sm, DEFAULT_FREQUENCY) {};
       SK6812(uint strip_len, uint8_t din_pin, pio_hw_t *pio, uint sm, uint32_t frequency);
+      SK6812(uint strip_len, uint8_t din_pin, pio_hw_t *pio, uint sm, uint32_t frequency, bool rgbw);
       ~SK6812();
 
       SK6812_LED *get_strip() { return (strip); };
@@ -33,10 +34,8 @@ class SK6812 {
       void update_strip();
       void clear_strip();
 
-      static const uint32_t DEFAULT_FREQUENCY = 1000000;
-      static const uint8_t DEFAULT_SK6812_CLK_PIN = 2;
+      static const uint32_t DEFAULT_FREQUENCY = 800000;
       static const uint8_t DEFAULT_SK6812_DIN_PIN = 3;
-      static const uint8_t MAX_BRIGHTNESS = 31;
 
 
    private:
@@ -49,6 +48,7 @@ class SK6812 {
       uint dma_pio_tx;
       dma_channel_config sk6812_dma_channel_config;
       SK6812_LED *strip;
+      bool rgbw;
 
 
       uint32_t get_buffer_size();
